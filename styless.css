@@ -1,0 +1,55 @@
+/* Общие стили для страницы */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+/* Заголовок */
+h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Стили для кнопок */
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+/* Стиль кнопки "Анализировать тест" */
+#analyze {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Стиль кнопки "Показать ответы" */
+#show-answers {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Стили для блока, который отображает правильный ответ */
+.correct-answer {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #e8f5e9;
+    border-left: 5px solid #4CAF50;
+    color: #333;
+    font-size: 16px;
+    border-radius: 5px;
+    width: 80%;
+    text-align: left;
+    display: none; /* Изначально скрыто */
+}
