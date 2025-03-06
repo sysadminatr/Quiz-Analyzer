@@ -4,36 +4,47 @@ function extractQuizData() {
 
     questions.forEach(q => {
         let questionText = q.querySelector(".qtext").innerText.trim();
-        
-        let answerText = "Ответ не найден"; // Значение по умолчанию
-        
-        // Ищем правильный ответ, если он отмечен как правильный (через класс "correct")
-        let answerElement = q.querySelector(".answer input.correct") || q.querySelector(".answer label.correct");
+        let correctAnswers = []; // Массив для хранения всех правильных ответов
 
-        if (answerElement) {
+        // Ищем правильные ответы через класс "correct" для всех элементов (input и label)
+        let answerElements = q.querySelectorAll(".answer input.correct, .answer label.correct");
+
+        answerElements.forEach(answerElement => {
+            let answerText = "";
+
             if (answerElement.tagName === 'INPUT') {
                 answerText = answerElement.value.trim();
             } else if (answerElement.tagName === 'LABEL') {
                 answerText = answerElement.innerText.trim();
             }
-        } else {
-            // Если правильный ответ не найден через класс "correct", ищем через чекбоксы
-            let answerElement1 = q.querySelector(".answer input[type='checkbox']:checked");
-            if (answerElement1) {
+
+            if (answerText && !correctAnswers.includes(answerText)) {
+                correctAnswers.push(answerText);
+            }
+        });
+
+        // Если через класс "correct" не нашли правильных ответов, ищем через чекбоксы
+        if (correctAnswers.length === 0) {
+            let checkedAnswerElements = q.querySelectorAll(".answer input[type='checkbox']:checked");
+
+            checkedAnswerElements.forEach(answerElement1 => {
                 let answerId = answerElement1.getAttribute('id');
                 let labelElement = q.querySelector(`.answer label[for='${answerId}']`);
                 
                 // Проверка на наличие правильного ответа
                 let correctnessElement = labelElement ? labelElement.closest('.content').querySelector('.correctness.correct') : null;
                 if (labelElement && correctnessElement) {
-                    answerText = labelElement.innerText.trim();
+                    let answerText = labelElement.innerText.trim();
+                    if (answerText && !correctAnswers.includes(answerText)) {
+                        correctAnswers.push(answerText);
+                    }
                 }
-            }
+            });
         }
 
-        // Добавляем в итоговый массив все ответы, только если они найдены
-        if (answerText !== "Ответ не найден") {
-            quizData.push({ question: questionText, answer: answerText });
+        // Добавляем в итоговый массив только если найдены правильные ответы
+        if (correctAnswers.length > 0) {
+            quizData.push({ question: questionText, answers: correctAnswers });
         }
     });
 
@@ -89,43 +100,62 @@ function showAnswers() {
     questions.forEach(q => {
         let existingAnswer = q.querySelector(".correct-answer");
         if (!existingAnswer) {
-            let answerText = "Ответ не найден"; // Значение по умолчанию
+            let correctAnswers = []; // Массив для хранения всех правильных ответов
 
-            // Ищем правильный ответ, если он отмечен как "correct"
-            let answerElement = q.querySelector(".answer input.correct") || q.querySelector(".answer label.correct");
+            // Ищем все правильные ответы, если они отмечены как "correct"
+            let answerElements = q.querySelectorAll(".answer input.correct, .answer label.correct");
 
-            if (answerElement) {
+            answerElements.forEach(answerElement => {
+                let answerText = "";
+
                 if (answerElement.tagName === 'INPUT') {
                     answerText = answerElement.value.trim();
                 } else if (answerElement.tagName === 'LABEL') {
                     answerText = answerElement.innerText.trim();
                 }
-            } else {
-                // Если через "correct" не найдено, ищем через чекбоксы
-                let answerElement1 = q.querySelector(".answer input[type='checkbox']:checked");
-                if (answerElement1) {
+
+                if (answerText && !correctAnswers.includes(answerText)) {
+                    correctAnswers.push(answerText);
+                }
+            });
+
+            // Если правильные ответы через "correct" не найдены, ищем через чекбоксы
+            if (correctAnswers.length === 0) {
+                let checkedAnswerElements = q.querySelectorAll(".answer input[type='checkbox']:checked");
+
+                checkedAnswerElements.forEach(answerElement1 => {
                     let answerId = answerElement1.getAttribute('id');
                     let labelElement = q.querySelector(`.answer label[for='${answerId}']`);
-
-                    // Проверка, что ответ верный
+                    
+                    // Проверка на наличие правильного ответа
                     let correctnessElement = labelElement ? labelElement.closest('.content').querySelector('.correctness.correct') : null;
                     if (labelElement && correctnessElement) {
-                        answerText = labelElement.innerText.trim();
+                        let answerText = labelElement.innerText.trim();
+                        if (answerText && !correctAnswers.includes(answerText)) {
+                            correctAnswers.push(answerText);
+                        }
                     }
-                }
+                });
             }
 
-            // Выводим правильный ответ под вопросом
-            if (answerText !== "Ответ не найден") {
+            // Если правильные ответы найдены, выводим их
+            if (correctAnswers.length > 0) {
                 let answerDiv = document.createElement("div");
                 answerDiv.classList.add("correct-answer");
                 answerDiv.style.cssText = "margin-top: 10px; padding: 5px; background: #d4edda; color: #155724; border-left: 4px solid #28a745;";
-                answerDiv.innerText = `Правильный ответ: ${answerText}`;
+
+                // Выводим все правильные ответы
+                answerDiv.innerHTML = `Правильные ответы: <ul>`;
+                correctAnswers.forEach(answer => {
+                    answerDiv.innerHTML += `<li>${answer}</li>`;
+                });
+                answerDiv.innerHTML += `</ul>`;
                 q.appendChild(answerDiv);
             }
         }
     });
 }
+
 
 // Добавляем кнопку "Показать ответы"
 let showAnswersButton = document.createElement("button");
