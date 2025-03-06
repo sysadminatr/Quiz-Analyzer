@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Quiz Analyzer",
+  "version": "1.0",
+  "description": "Анализирует тест и сохраняет правильные ответы в базу данных.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://study.tusur.ru/*",
+    "https://tests.tusur.ru/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://study.tusur.ru/*",
+        "https://tests.tusur.ru/*"
+      ],
+      "js": ["content.js"]
+    }
+  ]
+}
